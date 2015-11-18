@@ -1,17 +1,22 @@
 package view;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import org.json.simple.*;
 
-/**
- * Created by haegyun on 11/8/15.
- */
-public class LoginFrame extends JFrame{
+
+import controller.LoginService;
+import view.LobbyFrame;
+
+
+public class LoginFrame extends JFrame implements ActionListener{
     BufferedImage img = null;
     JTextField loginIDField = null;
     JPasswordField loginPasswordField = null;
@@ -72,13 +77,9 @@ public class LoginFrame extends JFrame{
         loginButton.setBorderPainted(false);
         loginButton.setFocusPainted(false);
         loginButton.setContentAreaFilled(false);
-
+        loginButton.addActionListener(this);
 
         layeredPane.add(loginButton);
-
-
-
-
 
         layeredPane.add(panel);
         add(layeredPane);
@@ -91,4 +92,35 @@ public class LoginFrame extends JFrame{
             g.drawImage(img, 0, 0, null);
         }
     }
+
+    @Override
+    public  void actionPerformed(ActionEvent e) {
+
+        String id = loginIDField.getText();
+        char[] pass = loginPasswordField.getPassword();
+        String password = new String(pass);
+
+        System.out.println(id + password);
+
+
+//        if (id.equals("") || password.equals("")) {
+//            // 메시지를 날린다.
+//            JOptionPane.showMessageDialog(null, "빈칸이 있네요");
+//        } else {
+//
+//            // 로그인 참 거짓 여부를 판단
+//            boolean existLogin = LoginService.loginTest(id, password);
+//
+//            if (existLogin) {
+//                // 로그인 성공일 경우
+//                JOptionPane.showMessageDialog(null, "로그인 성공");
+//            } else {
+//                // 로그인 실패일 경우
+//                JOptionPane.showMessageDialog(null, "로그인 실패");
+//            }
+//
+//        }
+        password = null;
+    }
+
 }
