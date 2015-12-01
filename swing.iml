@@ -8,5 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="org.apache.clerezza.ext:org.json.simple:0.4" level="project" />
+    <orderEntry type="library" name="org.apache.httpcomponents:fluent-hc:4.2-alpha1" level="project" />
+    <orderEntry type="library" name="com.mashape.unirest:unirest-java:1.4.7" level="project" />
   </component>
 </module>
