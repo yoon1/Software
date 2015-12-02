@@ -172,7 +172,6 @@ public class RoomFrame extends JFrame{
                     //  StatusCode가 204(no content) 즉, 서버에서 delete가 성공했을 경우에
                     if (jsonResponse.getStatus() == 204 || jsonResponse.getStatus() == 200) {
                         roomBackground.getChatSocket().close();
-                        drawingArea.getPaintBackground().getPaintSocket().close();
                         User.getUser().setCurrent_room(0);
                         dispose();
                         new LobbyFrame();
@@ -193,14 +192,21 @@ public class RoomFrame extends JFrame{
                         System.out.println("오답입니다.");
                 } else {
                     String msg = User.getUser().getUsername() + ":" + chatField.getText() + "\n";
-                    roomBackground.sendMsg(msg);
+                    try {
+                        RoomBackground.getDos().writeUTF(msg);
+                        System.out.println("보내질메세지는 " + msg);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                     chatField.setText("");
+
                 }
             }
         });
 
         if(guest!=null) {  // 만약 게스트일 경우.
             buttonContainer.setVisible(false);
+
         }
 
         pack();

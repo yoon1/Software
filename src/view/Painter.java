@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -19,8 +20,6 @@ public class Painter extends JPanel {
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 600;
     private static final Color BackColor = Color.white;
-
-    private PaintBackground paintBackground;
 
     private int x1;
     private int y1;
@@ -36,15 +35,9 @@ public class Painter extends JPanel {
     String paintInfo;
     BufferedImage bImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-    public PaintBackground getPaintBackground() {
-        return paintBackground;
-    }
-
-
     public Painter()
     {
         setBorder(BorderFactory.createLineBorder(Color.black));
-        paintBackground = new PaintBackground();
 
         //Basic Settings for bImage
         Graphics g = bImage.getGraphics();
@@ -61,7 +54,6 @@ public class Painter extends JPanel {
 
         addMouseMotionListener(new MouseAdapter() {
             public void mouseDragged(MouseEvent e) {
-                System.out.println("나는 mouseDragged 그림을 그리고 있다.");
                 points.add(e.getPoint());
                 repaint();
             }
@@ -70,7 +62,6 @@ public class Painter extends JPanel {
 
         addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
-                System.out.println("나는 mouseReleased 그림을 그리고 있다.");
                 points.add(e.getPoint());
                 repaint();
             }
@@ -79,29 +70,27 @@ public class Painter extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        System.out.println("나는 getPreferredSize 그림을 그리고 있다.");
         return new Dimension(WIDTH,HEIGHT);
     }
 
     @Override
     public void paintComponent(Graphics g) {
-        System.out.println("나는 paintComponent 그림을 그리고 있다.");
         super.paintComponent(g);
-        drawIntoBufferedImage();
+        try {
+            drawIntoBufferedImage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         g.drawImage(bImage, 0, 0, null);
     }
 
-    public void drawIntoBufferedImage()
-    {
-        System.out.println("나는 drawIntoBufferedImage 그림을 그리고 있다.");
+    public void drawIntoBufferedImage() throws IOException {
         Graphics g = bImage.getGraphics();
         freehandLines(g);
         g.dispose();
     }
 
-    public void freehandLines(Graphics g)
-    {
-        System.out.println("나는 freehandLines 그림을 그리고 있다.");
+    public void freehandLines(Graphics g) throws IOException {
         if(points != null && points.size() > 1)
         {
 
@@ -127,7 +116,7 @@ public class Painter extends JPanel {
 
                 colorInfo = getCurrentColor().getRed() + "," + getCurrentColor().getGreen() + "," + getCurrentColor().getBlue();
 
-                paintBackground.sendPaintInfo("/paintinfos/" + x1 + "," + y1 + "," + x2 + "," + y2 + "/" + colorInfo);
+                RoomBackground.getDos().writeUTF("/paintinfos/" + x1 + "," + y1 + "," + x2 + "," + y2 + "/" + colorInfo);
                 g.drawLine(x1, y1, x2, y2);
             }
         }
