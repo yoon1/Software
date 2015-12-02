@@ -38,12 +38,12 @@ public class RoomFrame extends JFrame{
     private BufferedImage img = null;
     private Painter drawingArea = new Painter();
     private JPanel buttonContainer = new JPanel();
-    private JButton redColor = new JButton("Red");
-    private JButton blueColor = new JButton("Blue");
-    private JButton blackColor = new JButton("Black");
-    private JButton eraser = new JButton("Eraser");
-    private JButton startButton = new JButton("Start");
-    private JButton exitButton = new JButton("Exit");
+    private JButton redColorBtn = new JButton("Red");
+    private JButton blueColorBtn = new JButton("Blue");
+    private JButton blackColorBtn = new JButton("Black");
+    private JButton eraserBtn = new JButton("Eraser");
+    private JButton startBtn = new JButton("Start");
+    private JButton exitBtn = new JButton("Exit");
     private JTextArea chatArea = new JTextArea();
     private JTextField chatField = new JTextField(30);
     private RoomBackground roomBackground;
@@ -67,13 +67,11 @@ public class RoomFrame extends JFrame{
         roomBackground.setjScrollPane(jScrollPane);
         roomBackground.setChatArea(chatArea);
 
-//      "makeRoom"을 통해 방에 입장한 사용자일 경우, Host 역할.
-        if(User.getUser().getIsHost()) {
+        if(User.getUser().getIsHost()) {    // "makeRoom"을 통해 방에 입장한 사용자일 경우, Host 역할.
             User.getUser().setIsHost(true);
             host = new Host();
         }
-//      "enterRoom"을 통해 방에 입장한 사용자일 경우, Guest 역할.
-        else {
+        else {                              // "enterRoom"을 통해 방에 입장한 사용자일 경우, Guest 역할.
             User.getUser().setIsHost(false);
             guest = new Guest();
             guest.setRoomFrame(this);
@@ -99,74 +97,68 @@ public class RoomFrame extends JFrame{
         panel.setBounds(0, 0, 1000, 600);
 
         // 색고르기
-        buttonContainer.add(redColor);
-        buttonContainer.add(blueColor);
-        buttonContainer.add(blackColor);
-        buttonContainer.add(eraser);
+        buttonContainer.add(redColorBtn);
+        buttonContainer.add(blueColorBtn);
+        buttonContainer.add(blackColorBtn);
+        buttonContainer.add(eraserBtn);
 
-        redColor.setBounds(80, 70, 70, 30);
-        blueColor.setBounds(150, 70, 70, 30);
-        blackColor.setBounds(220, 70, 70, 30);
-        eraser.setBounds(290, 70, 70, 30);
-        startButton.setBounds(600, 70, 70, 30);
-        exitButton.setBounds(700, 70, 70, 30);
+        redColorBtn.setBounds(80, 70, 70, 30);
+        blueColorBtn.setBounds(150, 70, 70, 30);
+        blackColorBtn.setBounds(220, 70, 70, 30);
+        eraserBtn.setBounds(290, 70, 70, 30);
+        startBtn.setBounds(600, 70, 70, 30);
+        exitBtn.setBounds(700, 70, 70, 30);
         chatField.setBounds(550, 450, 320, 30);
         userScrollPane.setBounds(550, 127, 320, 110);
         drawingArea.setBounds(43, 130, 335, 361);
         jScrollPane = new JScrollPane(chatArea);
         jScrollPane.setBounds(550, 250, 320, 135);
 
-        layeredPane.add(redColor);
-        layeredPane.add(blueColor);
-        layeredPane.add(blackColor);
-        layeredPane.add(eraser);
-        layeredPane.add(startButton);
-        layeredPane.add(exitButton);
+        layeredPane.add(redColorBtn);
+        layeredPane.add(blueColorBtn);
+        layeredPane.add(blackColorBtn);
+        layeredPane.add(eraserBtn);
+        layeredPane.add(startBtn);
+        layeredPane.add(exitBtn);
         layeredPane.add(jScrollPane);
         layeredPane.add(chatField);
         layeredPane.add(userScrollPane);
         layeredPane.add(drawingArea);
 
-        pack();
-        this.add(layeredPane);
-        this.setTitle("방");
-        this.setSize(1000, 600);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setLayout(null);
-        this.setVisible(true);
-
-        redColor.addActionListener(new ActionListener() {
+        redColorBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingArea.setCurrentColor(Color.RED);
             }
         });
-        blueColor.addActionListener(new ActionListener() {
+        blueColorBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingArea.setCurrentColor(Color.blue);
             }
         });
-        blackColor.addActionListener(new ActionListener() {
+        blackColorBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingArea.setCurrentColor(Color.black);
             }
         });
-        eraser.addActionListener(new ActionListener() {
+        eraserBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 drawingArea.setCurrentColor(Color.white);
             }
         });
-        startButton.addMouseListener(new MouseAdapter() {
+
+        startBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 answer = host.requestAnswer();
                 System.out.println("문제는.." + answer);
             }
         });
-        exitButton.addMouseListener(new MouseAdapter() {
+
+        exitBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 try {
@@ -180,6 +172,7 @@ public class RoomFrame extends JFrame{
                     //  StatusCode가 204(no content) 즉, 서버에서 delete가 성공했을 경우에
                     if (jsonResponse.getStatus() == 204 || jsonResponse.getStatus() == 200) {
                         roomBackground.getChatSocket().close();
+                        drawingArea.getPaintBackground().getPaintSocket().close();
                         User.getUser().setCurrent_room(0);
                         dispose();
                         new LobbyFrame();
@@ -187,9 +180,7 @@ public class RoomFrame extends JFrame{
                         System.out.println("Fail exit from room");
                     }
                 } catch (UnirestException e) {
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                } catch (IOException e) {e.printStackTrace();}
             }
         });
         chatField.addActionListener(new ActionListener() {
@@ -207,6 +198,18 @@ public class RoomFrame extends JFrame{
                 }
             }
         });
+
+        if(guest!=null) {  // 만약 게스트일 경우.
+            buttonContainer.setVisible(false);
+        }
+
+        pack();
+        this.add(layeredPane);
+        this.setTitle("방");
+        this.setSize(1000, 600);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setLayout(null);
+        this.setVisible(true);
     }
 
     public void getUsersInRoom(int roomId) {

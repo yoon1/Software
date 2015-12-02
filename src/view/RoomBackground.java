@@ -10,8 +10,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class RoomBackground {
+
+    private static String socket_server = "127.0.0.1";
+//    private static String socket_server = "52.192.150.155";
 
     private DataInputStream chatIn;
     private DataOutputStream chatOut;
@@ -20,14 +24,12 @@ public class RoomBackground {
     private JTextArea chatArea;
 
     private Socket chatSocket;
-
+    private Color currentColor;
+    private Color eraseColor = new Color(255,255,255);
 
     private ChatReceiver chatReceiver;
     private int thisRoomId = User.getUser().getCurrent_room();
     private DefaultTableModel defaultUserTableModel;
-
-    private static String socket_server = "127.0.0.1";
-//    private static String socket_server = "52.192.150.155";
 
     public Socket getChatSocket() {
         return chatSocket;
@@ -50,8 +52,6 @@ public class RoomBackground {
 
 
     public RoomBackground() throws IOException {
-//        Painter painter = new Painter();
-//        painter.setRoomBackground(this);
         chatSocket = new Socket(socket_server, 7777);
         chatReceiver = new ChatReceiver(chatSocket);
         chatReceiver.start();
@@ -81,20 +81,28 @@ public class RoomBackground {
             try {
                 while(chatIn != null) {
                     String chatMsg = chatIn.readUTF();
-                    System.out.println("들어오는 메세지 ::: " + chatMsg);
-                    if (chatMsg.contains("/xyp/")) {
-                        System.out.println("잘받았다. 나는 RoomBackground다." + chatMsg);
-                        String[] splitedChatMsg = chatMsg.split("/xyp/");
-                        String[] splitedPaintInfos = splitedChatMsg[1].split(",");
+//                    System.out.println("들어오는 메세지 ::: " + chatMsg);
+                    if (chatMsg.contains("/paintinfos/") && !(User.getUser().getIsHost())) {
+                        String[] splitedChatMsg = chatMsg.split("/");
+                        System.out.println(Arrays.toString(splitedChatMsg));
+                        String[] splitedPaintInfos = splitedChatMsg[2].split(",");
+                        String[] splitedColorInfos = splitedChatMsg[3].split(",");
+
                         Graphics2D g = (Graphics2D) roomFrame.getDrawingArea().getGraphics();
-                        g.drawLine(
-                                Integer.parseInt(splitedPaintInfos[0]),
-                                Integer.parseInt(splitedPaintInfos[1]),
-                                Integer.parseInt(splitedPaintInfos[2]),
-                                Integer.parseInt(splitedPaintInfos[3])
-                        );
+
+                        currentColor = new Color(Integer.parseInt(splitedColorInfos[0]), Integer.parseInt(splitedColorInfos[1]), Integer.parseInt(splitedColorInfos[2]));
+
+                        g.setColor(currentColor);
+                        if(g.getColor().toString().equals(eraseColor.toString())) {
+                            g.setStroke(new BasicStroke(30));
+                        }
+                        else {
+                            g.setStroke(new BasicStroke(1));
+                        }
+
+                        g.drawLine(Integer.parseInt(splitedPaintInfos[0]),Integer.parseInt(splitedPaintInfos[1]),Integer.parseInt(splitedPaintInfos[2]),Integer.parseInt(splitedPaintInfos[3]));
                     }
-                    else {
+                    else if(!(chatMsg.contains("/paintinfos/"))){
                         roomFrame.appendMsg(chatMsg);
                         jScrollPane.getVerticalScrollBar().setValue(jScrollPane.getVerticalScrollBar().getMaximum());
                         chatArea.setCaretPosition(chatArea.getLineEndOffset(chatArea.getLineCount() - 1));

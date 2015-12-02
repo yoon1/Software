@@ -20,12 +20,6 @@ import org.json.simple.JSONObject;
 import model.User;
 
 public class LobbyFrame extends JFrame {
-    private String roomColumns[] = {"id", "title", "current_num", "limit_num", "is_playing"};
-    private Object roomRows[][] = null;
-
-    private String userColumns[] = {"id", "username", "current_room"};
-    private Object userRows[][] = null;
-
     private static String GET_USERS_URL = "http://localhost:8080/users";
     private static String GET_USER_URL = "http://localhost:8080/users/";
     private static String GET_ROOMS_URL = "http://localhost:8080/rooms";
@@ -36,6 +30,12 @@ public class LobbyFrame extends JFrame {
 //    private static String GET_ROOMS_URL = "http://52.192.150.155:8080/rooms";
 //    private static String ENTER_ROOM_URL = "http://52.192.150.155:8080/room/enter";
 //    private static String MAKE_ROOM_URL = "http://52.192.150.155:8080/room/make";
+
+    private String roomColumns[] = {"id", "title", "current_num", "limit_num", "is_playing"};
+    private Object roomRows[][] = null;
+
+    private String userColumns[] = {"id", "username", "current_room"};
+    private Object userRows[][] = null;
 
     private static int ROOM_FIELDS_NUM = 5;
     private static int USER_FIELDS_NUM = 3;
