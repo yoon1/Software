@@ -20,16 +20,16 @@ import org.json.simple.JSONObject;
 import model.User;
 
 public class LobbyFrame extends JFrame {
-    private static String GET_USERS_URL = "http://localhost:8080/users";
-    private static String GET_USER_URL = "http://localhost:8080/users/";
-    private static String GET_ROOMS_URL = "http://localhost:8080/rooms";
-    private static String ENTER_ROOM_URL = "http://localhost:8080/room/enter";
-    private static String MAKE_ROOM_URL = "http://localhost:8080/room/make";
-//    private static String GET_USERS_URL = "http://52.192.150.155:8080/users";
-//    private static String GET_USER_URL = "http://52.192.150.155:8080/users/";
-//    private static String GET_ROOMS_URL = "http://52.192.150.155:8080/rooms";
-//    private static String ENTER_ROOM_URL = "http://52.192.150.155:8080/room/enter";
-//    private static String MAKE_ROOM_URL = "http://52.192.150.155:8080/room/make";
+//    private static String GET_USERS_URL = "http://localhost:8080/users";
+//    private static String GET_USER_URL = "http://localhost:8080/users/";
+//    private static String GET_ROOMS_URL = "http://localhost:8080/rooms";
+//    private static String ENTER_ROOM_URL = "http://localhost:8080/room/enter";
+//    private static String MAKE_ROOM_URL = "http://localhost:8080/room/make";
+    private static String GET_USERS_URL = "http://52.192.150.155:8080/users";
+    private static String GET_USER_URL = "http://52.192.150.155:8080/users/";
+    private static String GET_ROOMS_URL = "http://52.192.150.155:8080/rooms";
+    private static String ENTER_ROOM_URL = "http://52.192.150.155:8080/room/enter";
+    private static String MAKE_ROOM_URL = "http://52.192.150.155:8080/room/make";
 
     private String roomColumns[] = {"id", "title", "current_num", "limit_num", "is_playing"};
     private Object roomRows[][] = null;
@@ -107,17 +107,17 @@ public class LobbyFrame extends JFrame {
         JScrollPane roomScrollPane = new JScrollPane(roomTable);
         JScrollPane userScrollPane = new JScrollPane(userTable);
 
-        roomScrollPane.getViewport().setBackground(Color.BLUE);
+//        roomScrollPane.getViewport().setBackground(Color.BLUE);
         roomScrollPane.setBounds(0, 0, 600, 400);
 
-        userScrollPane.getViewport().setBackground(Color.GREEN);
+//        userScrollPane.getViewport().setBackground(Color.GREEN);
         userScrollPane.setBounds(700, 0, 300, 600);
 
 //      루트 패널에 tablePanel을 포함시킴
         JPanel rootPanel = new JPanel();
         rootPanel.add(roomScrollPane);
         rootPanel.add(userScrollPane);
-        rootPanel.setBackground(Color.RED);
+//        rootPanel.setBackground(Color.RED);
         rootPanel.setLayout(null);
 
         JButton makeRoomBtn = new JButton();

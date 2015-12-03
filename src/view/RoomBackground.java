@@ -16,8 +16,8 @@ import java.util.Arrays;
 
 public class RoomBackground {
 
-    private static String socket_server = "127.0.0.1";
-//    private static String socket_server = "52.192.150.155";
+//    private static String socket_server = "127.0.0.1";
+    private static String socket_server = "52.192.150.155";
 
     private static Socket chatSocket;
     private static DataOutputStream dos;

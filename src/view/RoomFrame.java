@@ -29,10 +29,10 @@ import java.util.Timer;
 
 public class RoomFrame extends JFrame{
 
-    private static String EXIT_ROOM_URL = "http://localhost:8080/room/exit";
-    private static String ROOM_URL = "http://localhost:8080/rooms/";
-//    private static String EXIT_ROOM_URL = "http://52.192.150.155:8080/room/exit";
-//    private static String ROOM_URL = "http://52.192.150.155:8080/rooms/";
+//    private static String EXIT_ROOM_URL = "http://localhost:8080/room/exit";
+//    private static String ROOM_URL = "http://localhost:8080/rooms/";
+    private static String EXIT_ROOM_URL = "http://52.192.150.155:8080/room/exit";
+    private static String ROOM_URL = "http://52.192.150.155:8080/rooms/";
 
     private int ROOM_ID;
 
@@ -197,7 +197,7 @@ public class RoomFrame extends JFrame{
                     playingState = true;
                     roomBackground.setRoomFrame(RoomFrame.this);
                     host.sendGameStartSignal();
-                    TimerService timerService = new TimerService(10); // 5초간 타이머가 동작한다
+                    TimerService timerService = new TimerService(60); // 5초간 타이머가 동작한다
                     timerService.setHost(host);
                     timerService.setRoomFrame(RoomFrame.this);
                 }
