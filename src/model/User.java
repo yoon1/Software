@@ -32,23 +32,6 @@ public class User {
                 '}';
     }
 
-    public void requestUser() {
-        try {
-            JSONObject user = null;
-            HttpResponse<JsonNode> jsonResponse = Unirest.get("http://localhost:8080/users/"+User.getUser().getId())
-                    .header("accept", "application/json")
-                    .asJson();
-            if (jsonResponse.getStatus()!=404) {
-                Object jsonObj = JSONValue.parse(jsonResponse.getBody().toString());
-//                JSONArray userArray = (JSONArray) jsonObj;
-
-            } else {
-                System.out.println("사용자가 없습니다.");
-            }
-
-        }catch (UnirestException e ) {}
-    }
-
     public int getId() {
         return id;
     }

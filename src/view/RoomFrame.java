@@ -8,11 +8,13 @@ import java.io.File;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import Service.TimerService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -23,6 +25,7 @@ import model.User;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import java.util.Timer;
 
 public class RoomFrame extends JFrame{
 
@@ -32,12 +35,16 @@ public class RoomFrame extends JFrame{
 //    private static String ROOM_URL = "http://52.192.150.155:8080/rooms/";
 
     private int ROOM_ID;
+
+    private static boolean playingState = false;
     private static int USER_FIELDS_NUM = 3;
     private String userColumns[] = {"id", "username", "current_room"};
     private Object userRows[][] = null;
     private BufferedImage img = null;
     private Painter drawingArea = new Painter();
     private JPanel buttonContainer = new JPanel();
+    private JLabel statusBar = new JLabel();
+    private JLabel answerBar = new JLabel();
     private JButton redColorBtn = new JButton("Red");
     private JButton blueColorBtn = new JButton("Blue");
     private JButton blackColorBtn = new JButton("Black");
@@ -50,7 +57,7 @@ public class RoomFrame extends JFrame{
     private JScrollPane jScrollPane;
     private Host host;
     private Guest guest;
-    private String answer;
+
     private DefaultTableModel defaultUserTableModel = new DefaultTableModel(userRows, userColumns) {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -58,11 +65,38 @@ public class RoomFrame extends JFrame{
         }
     };;
 
+    public void setPlayingState(boolean ps) {
+        playingState = ps;
+    }
+
+    public boolean getPlayingState() {
+        return playingState;
+    }
+
+    public Painter getDrawingArea() {
+        return drawingArea;
+    }
+
+    public void appendMsg(String msg) {
+        chatArea.append(msg);
+    }
+
+    public void changeStatusBar(String msg) {
+        statusBar.setText(msg);
+    }
+
+    public void changeAnswerBar(String msg) {
+        answerBar.setText(msg);
+    }
+
+
     public RoomFrame(int roomId) throws IOException {
+        final RoomFrame roomFrame = this;
+
         ROOM_ID = roomId;
         jScrollPane = new JScrollPane(chatArea);
-        roomBackground  = new RoomBackground();
-        roomBackground.setRoomFrame(this);
+        roomBackground = new RoomBackground();
+        roomBackground.setRoomFrame(roomFrame);
         roomBackground.setDefaultUserTableModel(defaultUserTableModel);
         roomBackground.setjScrollPane(jScrollPane);
         roomBackground.setChatArea(chatArea);
@@ -70,11 +104,12 @@ public class RoomFrame extends JFrame{
         if(User.getUser().getIsHost()) {    // "makeRoom"을 통해 방에 입장한 사용자일 경우, Host 역할.
             User.getUser().setIsHost(true);
             host = new Host();
+            roomBackground.setHost(host);
         }
         else {                              // "enterRoom"을 통해 방에 입장한 사용자일 경우, Guest 역할.
             User.getUser().setIsHost(false);
             guest = new Guest();
-            guest.setRoomFrame(this);
+            guest.setRoomFrame(roomFrame);
         }
 
         try {
@@ -111,9 +146,14 @@ public class RoomFrame extends JFrame{
         chatField.setBounds(550, 450, 320, 30);
         userScrollPane.setBounds(550, 127, 320, 110);
         drawingArea.setBounds(43, 130, 335, 361);
+        drawingArea.setBorder(BorderFactory.createEmptyBorder());
         jScrollPane = new JScrollPane(chatArea);
         jScrollPane.setBounds(550, 250, 320, 135);
+        statusBar.setBounds(407, 70, 300, 70);
+        answerBar.setBounds(407, 0, 300, 70);
 
+        layeredPane.add(statusBar); //
+        layeredPane.add(answerBar); //
         layeredPane.add(redColorBtn);
         layeredPane.add(blueColorBtn);
         layeredPane.add(blackColorBtn);
@@ -153,43 +193,53 @@ public class RoomFrame extends JFrame{
         startBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                answer = host.requestAnswer();
-                System.out.println("문제는.." + answer);
+                if(!playingState) {
+                    playingState = true;
+                    roomBackground.setRoomFrame(RoomFrame.this);
+                    host.sendGameStartSignal();
+                    TimerService timerService = new TimerService(10); // 5초간 타이머가 동작한다
+                    timerService.setHost(host);
+                    timerService.setRoomFrame(RoomFrame.this);
+                }
             }
         });
 
         exitBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                try {
-                    HttpResponse<JsonNode> jsonResponse = Unirest.post(EXIT_ROOM_URL)
-                            .header("accept", "application/json")
-                            .field("user_id", User.getUser().getId())
-                            .field("room_id", ROOM_ID)
-                            .field("is_host", User.getUser().getIsHost())
-                            .asJson();
-                    System.out.println("Before" + jsonResponse.getBody());
-                    //  StatusCode가 204(no content) 즉, 서버에서 delete가 성공했을 경우에
-                    if (jsonResponse.getStatus() == 204 || jsonResponse.getStatus() == 200) {
-                        roomBackground.getChatSocket().close();
-                        User.getUser().setCurrent_room(0);
-                        dispose();
-                        new LobbyFrame();
-                    } else {
-                        System.out.println("Fail exit from room");
-                    }
-                } catch (UnirestException e) {
-                } catch (IOException e) {e.printStackTrace();}
+                if(!playingState){
+                    try {
+                        HttpResponse<JsonNode> jsonResponse = Unirest.post(EXIT_ROOM_URL)
+                                .header("accept", "application/json")
+                                .field("user_id", User.getUser().getId())
+                                .field("room_id", ROOM_ID)
+                                .field("is_host", User.getUser().getIsHost())
+                                .asJson();
+                        System.out.println("Before" + jsonResponse.getBody());
+                        //  StatusCode가 204(no content) 즉, 서버에서 delete가 성공했을 경우에
+                        if (jsonResponse.getStatus() == 204 || jsonResponse.getStatus() == 200) {
+                            roomBackground.getChatSocket().close();
+                            User.getUser().setCurrent_room(0);
+                            dispose();
+                            new LobbyFrame();
+                        } else {
+                            System.out.println("Fail exit from room");
+                        }
+                    } catch (UnirestException e) {
+                    } catch (IOException e) {e.printStackTrace();}
+                }
+                else {
+                    System.out.println("게임중엔 못나갑니다.");
+                }
             }
         });
+
         chatField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (chatField.getText().contains("*정답은*")) {
-                    if (guest.compareAnswer("chatField"))
-                        System.out.println("정답입니다.");
-                    else
-                        System.out.println("오답입니다.");
+                if (getPlayingState() && guest!=null) {
+                    System.out.println("나는 클라이언트, 정답을 보내봅니다.");
+                    guest.sendAnswer(chatField.getText());
                 } else {
                     String msg = User.getUser().getUsername() + ":" + chatField.getText() + "\n";
                     try {
@@ -198,15 +248,19 @@ public class RoomFrame extends JFrame{
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-                    chatField.setText("");
-
                 }
+                chatField.setText("");
             }
         });
 
         if(guest!=null) {  // 만약 게스트일 경우.
+            System.out.println("게스트네.");
             buttonContainer.setVisible(false);
-
+            redColorBtn.setVisible(false);
+            blueColorBtn.setVisible(false);
+            blackColorBtn.setVisible(false);
+            eraserBtn.setVisible(false);
+            startBtn.setVisible(false);
         }
 
         pack();
@@ -244,19 +298,6 @@ public class RoomFrame extends JFrame{
 
         }catch (UnirestException e ) {}
     }
-
-    public Painter getDrawingArea() {
-        return drawingArea;
-    }
-
-    public void appendMsg(String msg) {
-        chatArea.append(msg);
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
     class MyPanel extends JPanel{
         public void paint(Graphics g) {
             g.drawImage(img, 0, 0, null);

@@ -7,8 +7,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
@@ -29,7 +27,7 @@ public class Painter extends JPanel {
     private Graphics2D g2d;
     private String colorInfo;
 
-    ArrayList<Point> points = new ArrayList<Point>();
+    public ArrayList<Point> points = new ArrayList<Point>();
 
     private Color currentColor;
     String paintInfo;
@@ -47,23 +45,28 @@ public class Painter extends JPanel {
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                points.clear();
-                points.add(e.getPoint());
+                if(User.getUser().getIsHost()) {
+                    points.clear();
+                    points.add(e.getPoint());
+                }
             }
         });
 
         addMouseMotionListener(new MouseAdapter() {
             public void mouseDragged(MouseEvent e) {
-                points.add(e.getPoint());
-                repaint();
+                if(User.getUser().getIsHost()) {
+                    points.add(e.getPoint());
+                    repaint();
+                }
             }
-
         });
 
         addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
-                points.add(e.getPoint());
-                repaint();
+                if(User.getUser().getIsHost()) {
+                    points.add(e.getPoint());
+                    repaint();
+                }
             }
         });
     }
@@ -110,10 +113,6 @@ public class Painter extends JPanel {
                 x2 = points.get(i+1).x;
                 y2 = points.get(i+1).y;
 
-                System.out.println(getCurrentColor().getRed());
-                System.out.println(getCurrentColor().getGreen());
-                System.out.println(getCurrentColor().getBlue());
-
                 colorInfo = getCurrentColor().getRed() + "," + getCurrentColor().getGreen() + "," + getCurrentColor().getBlue();
 
                 RoomBackground.getDos().writeUTF("/paintinfos/" + x1 + "," + y1 + "," + x2 + "," + y2 + "/" + colorInfo);
@@ -134,7 +133,6 @@ public class Painter extends JPanel {
             g.dispose();
             repaint();
         }
-
     }
 
     public void setCurrentColor(Color currentColor) {
@@ -146,13 +144,12 @@ public class Painter extends JPanel {
         }
     }
 
-
-
     public Color getCurrentColor() {
         if (currentColor == null)
             return Color.BLACK;
         else
             return currentColor;
     }
+
 
 }
