@@ -43,6 +43,7 @@ public class Host extends User{
     public void sendGameStartSignal() {
         try {
             RoomBackground.getDos().writeUTF("/gamestart/");
+            RoomBackground.getDos().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,6 +52,7 @@ public class Host extends User{
     public void sendGameEndSignal() {
         try {
             RoomBackground.getDos().writeUTF("/gameend/");
+            RoomBackground.getDos().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,6 +61,7 @@ public class Host extends User{
     public void correctAnswerSignal(String username, String curAns) {
         try {
             RoomBackground.getDos().writeUTF("/correctanswer/" + username + "/" + curAns);
+            RoomBackground.getDos().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -244,6 +244,7 @@ public class RoomFrame extends JFrame{
                     String msg = User.getUser().getUsername() + ":" + chatField.getText() + "\n";
                     try {
                         RoomBackground.getDos().writeUTF(msg);
+                        RoomBackground.getDos().flush();
                         System.out.println("보내질메세지는 " + msg);
                     } catch (IOException e1) {
                         e1.printStackTrace();

@@ -41,8 +41,8 @@ public class TimerService {
 
             if (left_sec >= 0 && roomFrame.getPlayingState()) {
                 try {
-                    System.out.println("보내질 left_sec" + left_sec);
                     RoomBackground.getDos().writeUTF("/timerinfo/" + left_sec);
+                    RoomBackground.getDos().flush();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

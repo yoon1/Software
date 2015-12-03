@@ -78,6 +78,7 @@ public class RoomBackground {
         chatReceiver.start();
 
         dos.writeUTF(User.getUser().getUsername());
+        dos.flush();
 }
 
     public static DataOutputStream getDos() {
@@ -119,14 +120,13 @@ public class RoomBackground {
                     else if (chatMsg.contains("/timerinfo/")) {
                         String[] splitedTimerInfo = chatMsg.split("/");
                         String left_time = splitedTimerInfo[2];
-                        roomFrame.changeStatusBar(""+left_time);
-                        System.out.println("timeinfo"+left_time);
+                        roomFrame.changeStatusBar("" + left_time);
                     } else if (roomFrame.getPlayingState() && chatMsg.contains("/answerfromguest/")) {
 //                        방장이 정답을 비교하는 로직. 들어가면됨.
                         String[] splitedChatMsg = chatMsg.split("/");
                         String username = splitedChatMsg[2].replaceAll("\\s+", "") ;
                         String answerFromGuest = splitedChatMsg[3].replaceAll("\\s+", "") ;
-                        System.out.println("username, answer ! ! ! ! ! ! " + username + answerFromGuest);
+//                        System.out.println("username, answer ! ! ! ! ! ! " + username + answerFromGuest);
                         if(User.getUser().getIsHost()) {
                             if(currentAnswer.equals(answerFromGuest)) {
                                 host.correctAnswerSignal(username, currentAnswer);

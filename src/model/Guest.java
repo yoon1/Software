@@ -18,6 +18,7 @@ public class Guest extends User{
         try {
             System.out.println("내가 보낼 답은  " + expectAsw);
             RoomBackground.getDos().writeUTF("/answerfromguest/ " + User.getUser().getUsername() + "/" + expectAsw);
+            RoomBackground.getDos().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

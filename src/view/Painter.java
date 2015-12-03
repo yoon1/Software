@@ -116,6 +116,7 @@ public class Painter extends JPanel {
                 colorInfo = getCurrentColor().getRed() + "," + getCurrentColor().getGreen() + "," + getCurrentColor().getBlue();
 
                 RoomBackground.getDos().writeUTF("/paintinfos/" + x1 + "," + y1 + "," + x2 + "," + y2 + "/" + colorInfo);
+                RoomBackground.getDos().flush();
                 g.drawLine(x1, y1, x2, y2);
             }
         }
